@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Mê Cung Kho Báu</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+</head>
+<body>
+
+  <button id="sound-btn" title="Bật/Tắt âm thanh">🔊</button>
+
+  <!-- ═══ MENU ═══ -->
+  <div id="menu-screen" class="screen active">
+    <h1>Mê Cung Kho Báu</h1>
+    <p class="subtitle">Cuộc đua tìm đường về đích</p>
+    <div class="instructions">
+      <strong>Cách chơi:</strong><br>
+      Nhìn toàn bộ mê cung → Chọn cửa vào → Tung xúc xắc → Tính đường đi!<br>
+      Dùng <strong>chuột</strong> hoặc <strong>phím mũi tên</strong> để di chuyển<br>
+      👟 +3 bước • ⭐ +2 bước • ⚡ x2 bước • 🛡️ miễn bẫy<br>
+      💣 phá tường • 🗡️ diệt quái • 👻 xuyên tường • 🔀 đổi chỗ<br>
+      🕳️ hố sập • 🧊 đông băng • 👹 quái vật chặn đường<br>
+      Di chuột vào vật phẩm để xem mô tả • Ai về đích trước thắng!
+    </div>
+    <div class="character-roster">
+      <div class="char-card" style="--clr:#e74c3c"><img src="anhnhanvat/chi chau.jpg" alt="Chị Châu"><span>Chị Châu</span></div>
+      <div class="char-card" style="--clr:#3498db"><img src="anhnhanvat/em voi.jpg" alt="Em Voi"><span>Em Voi</span></div>
+      <div class="char-card" style="--clr:#2ecc71"><img src="anhnhanvat/bo Hoan.jpg" alt="Bố Hoàn"><span>Bố Hoàn</span></div>
+      <div class="char-card" style="--clr:#f39c12"><img src="anhnhanvat/me Trang.jpg" alt="Mẹ Trang"><span>Mẹ Trang</span></div>
+    </div>
+    <p class="subtitle">Chọn số người chơi</p>
+    <div class="player-select">
+      <button data-players="2">2 Người</button>
+      <button data-players="3">3 Người</button>
+      <button data-players="4">4 Người</button>
+    </div>
+    <button id="start-btn">Bắt Đầu</button>
+  </div>
+
+  <!-- ═══ GAME ═══ -->
+  <div id="game-screen" class="screen">
+    <div id="game-header">
+      <div id="turn-info"></div>
+      <div class="dice-area">
+        <div id="steps-info"></div>
+        <div id="dice">?</div>
+        <button id="roll-btn">Tung Xúc Xắc</button>
+      </div>
+    </div>
+    <div id="game-container">
+      <canvas id="maze-canvas"></canvas>
+    </div>
+    <div id="player-panel"></div>
+    <div id="message-bar"></div>
+  </div>
+
+  <!-- ═══ VICTORY ═══ -->
+  <div id="victory-screen" class="screen">
+    <h1>Chúc Mừng!</h1>
+    <div id="winner-info"></div>
+    <div id="rankings"></div>
+    <button id="replay-btn">Chơi Lại</button>
+  </div>
+
+  <canvas id="confetti"></canvas>
+
+  <script src="js/maze.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
