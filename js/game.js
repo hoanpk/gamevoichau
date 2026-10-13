@@ -93,6 +93,7 @@ class Game {
     });
 
     const click = (x, y) => {
+      this.audio.init();
       if (this.phase === 'gateSelect') this._gateClick(x, y);
       else if (this.phase === 'playing') this._playClick(x, y);
     };
@@ -102,7 +103,7 @@ class Game {
             (e.clientY - r.top) * (this.canvas.height / this.dpr / r.height));
     });
     this.canvas.addEventListener('touchstart', e => {
-      e.preventDefault();
+      e.preventDefault(); this.audio.init();
       const t = e.touches[0], r = this.canvas.getBoundingClientRect();
       click((t.clientX - r.left) * (this.canvas.width / this.dpr / r.width),
             (t.clientY - r.top) * (this.canvas.height / this.dpr / r.height));
@@ -146,7 +147,9 @@ class Game {
       else { this.audio.wallBump(); this._guide('Có tường chắn! Thử hướng khác.'); }
     });
 
-    window.addEventListener('resize', () => { if (this.phase !== 'menu') this._sizeCanvas(); });
+    const onResize = () => { if (this.phase !== 'menu') this._sizeCanvas(); };
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', () => setTimeout(onResize, 150));
   }
 
   /* ══════ Start ══════ */

@@ -5,9 +5,13 @@ class AudioManager {
   }
 
   init() {
-    if (this.ctx) return;
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      return;
+    }
     try {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
     } catch (e) {
       this.enabled = false;
     }
