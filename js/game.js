@@ -43,9 +43,21 @@ class Game {
     this.canvas = document.getElementById('maze-canvas');
     this.ctx = this.canvas.getContext('2d');
     this._loadAvatars();
+    this._fixViewport();
     this._menuEvents();
     this._gameEvents();
     this.showScreen('menu');
+  }
+
+  _fixViewport() {
+    const setVH = () => {
+      document.documentElement.style.height = window.innerHeight + 'px';
+      document.body.style.height = window.innerHeight + 'px';
+      document.querySelectorAll('.screen').forEach(s => { s.style.height = window.innerHeight + 'px'; });
+    };
+    setVH();
+    window.addEventListener('resize', setVH);
+    window.addEventListener('orientationchange', () => { setTimeout(setVH, 100); setTimeout(setVH, 300); });
   }
 
   _loadAvatars() {
@@ -149,7 +161,9 @@ class Game {
 
     const onResize = () => { if (this.phase !== 'menu') this._sizeCanvas(); };
     window.addEventListener('resize', onResize);
-    window.addEventListener('orientationchange', () => setTimeout(onResize, 150));
+    window.addEventListener('orientationchange', () => {
+      setTimeout(onResize, 150); setTimeout(onResize, 400); setTimeout(onResize, 800);
+    });
   }
 
   /* ══════ Start ══════ */
@@ -309,11 +323,11 @@ class Game {
     if (monster) {
       if (p.hasSword) {
         monster.alive = false; p.hasSword = false;
-        this._showTip(r, c, '🗡️', 'Tiêu diệt!', 'Quái vật đã bị hạ gục!');
+        this._showTip(r, c, '⚔', 'Tiêu diệt!', 'Quái vật đã bị hạ gục!');
         this.audio.itemPickup();
       } else if (p.hasShield) {
         p.hasShield = false;
-        this._showTip(r, c, '🛡️', 'Khiên bảo vệ!', 'Đỡ đòn quái vật!');
+        this._showTip(r, c, '🛡', 'Khiên bảo vệ!', 'Đỡ đòn quái vật!');
         this.audio.move();
       } else {
         this.steps = Math.max(0, this.steps - 2);
@@ -418,7 +432,7 @@ class Game {
       case 'pit':
         if (p.hasShield) {
           p.hasShield = false; this.audio.itemPickup();
-          this._showTip(r, c, '🛡️', 'Khiên bảo vệ!', 'Miễn nhiễm hố sập!');
+          this._showTip(r, c, '🛡', 'Khiên bảo vệ!', 'Miễn nhiễm hố sập!');
         } else {
           const gate = this.maze.gates[p.gate];
           p.row = gate.row; p.col = gate.col; this.steps = 0;
@@ -429,7 +443,7 @@ class Game {
       case 'freeze':
         if (p.hasShield) {
           p.hasShield = false; this.audio.itemPickup();
-          this._showTip(r, c, '🛡️', 'Khiên bảo vệ!', 'Miễn nhiễm đông băng!');
+          this._showTip(r, c, '🛡', 'Khiên bảo vệ!', 'Miễn nhiễm đông băng!');
         } else {
           p.skipTurn = true; this.audio.trap();
           this._showTip(r, c, item.emoji, item.name, 'Mất lượt tiếp theo!');
@@ -717,8 +731,8 @@ class Game {
 
       const icons = [];
       if (p.skipTurn)      icons.push('⛔');
-      if (p.hasSword)      icons.push('🗡️');
-      if (p.hasShield)     icons.push('🛡️');
+      if (p.hasSword)      icons.push('⚔');
+      if (p.hasShield)     icons.push('🛡');
       if (p.ghostSteps > 0) icons.push('👻');
       if (icons.length) {
         ctx.font = Math.max(7, cs * 0.24) + 'px sans-serif';
@@ -772,7 +786,7 @@ class Game {
         tip = { row: hr, col: hc, emoji: cell.item.emoji, title: cell.item.name, desc: cell.item.desc, alpha: 1 };
       const mon = this.monsters.find(m => m.row === hr && m.col === hc && m.alive);
       if (mon)
-        tip = { row: hr, col: hc, emoji: '👹', title: 'Quái Vật', desc: 'Cần 🗡️ hoặc mất 2 bước!', alpha: 1 };
+        tip = { row: hr, col: hc, emoji: '👹', title: 'Quái Vật', desc: 'Cần ⚔ hoặc mất 2 bước!', alpha: 1 };
     }
     if (this.actionTip && this.actionTip.alpha > 0) tip = this.actionTip;
     if (!tip) return;
@@ -835,8 +849,8 @@ class Game {
       else {
         const ic = [];
         if (p.skipTurn) ic.push('⛔');
-        if (p.hasSword) ic.push('🗡️');
-        if (p.hasShield) ic.push('🛡️');
+        if (p.hasSword) ic.push('⚔');
+        if (p.hasShield) ic.push('🛡');
         if (p.ghostSteps > 0) ic.push('👻' + p.ghostSteps);
         st = ic.join(' ');
       }

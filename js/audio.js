@@ -2,18 +2,29 @@ class AudioManager {
   constructor() {
     this.ctx = null;
     this.enabled = true;
+    this._unlocked = false;
   }
 
   init() {
-    if (this.ctx) {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-      return;
+    if (!this.ctx) {
+      try {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (e) {
+        this.enabled = false;
+        return;
+      }
     }
-    try {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-    } catch (e) {
-      this.enabled = false;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(function() {});
+    }
+    if (!this._unlocked) {
+      this._unlocked = true;
+      var c = this.ctx;
+      var b = c.createBuffer(1, 1, 22050);
+      var s = c.createBufferSource();
+      s.buffer = b;
+      s.connect(c.destination);
+      s.start(0);
     }
   }
 
@@ -22,11 +33,18 @@ class AudioManager {
     return this.enabled;
   }
 
+  _ensureRunning() {
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(function() {});
+    }
+  }
+
   _tone(freq, dur, type, vol, delay) {
     if (!this.ctx || !this.enabled) return;
-    const t = this.ctx.currentTime + (delay || 0);
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
+    this._ensureRunning();
+    var t = this.ctx.currentTime + (delay || 0);
+    var osc = this.ctx.createOscillator();
+    var gain = this.ctx.createGain();
     osc.type = type || 'sine';
     osc.frequency.setValueAtTime(freq, t);
     gain.gain.setValueAtTime(vol || 0.15, t);
@@ -39,17 +57,18 @@ class AudioManager {
 
   _noise(dur, vol) {
     if (!this.ctx || !this.enabled) return;
-    const t = this.ctx.currentTime;
-    const sz = Math.floor(this.ctx.sampleRate * dur);
-    const buf = this.ctx.createBuffer(1, sz, this.ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < sz; i++) d[i] = Math.random() * 2 - 1;
-    const src = this.ctx.createBufferSource();
+    this._ensureRunning();
+    var t = this.ctx.currentTime;
+    var sz = Math.floor(this.ctx.sampleRate * dur);
+    var buf = this.ctx.createBuffer(1, sz, this.ctx.sampleRate);
+    var d = buf.getChannelData(0);
+    for (var i = 0; i < sz; i++) d[i] = Math.random() * 2 - 1;
+    var src = this.ctx.createBufferSource();
     src.buffer = buf;
-    const gain = this.ctx.createGain();
+    var gain = this.ctx.createGain();
     gain.gain.setValueAtTime(vol || 0.1, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    const filt = this.ctx.createBiquadFilter();
+    var filt = this.ctx.createBiquadFilter();
     filt.type = 'lowpass';
     filt.frequency.value = 800;
     src.connect(filt);
@@ -60,7 +79,7 @@ class AudioManager {
   }
 
   diceRoll() {
-    for (let i = 0; i < 8; i++)
+    for (var i = 0; i < 8; i++)
       this._tone(200 + Math.random() * 600, 0.04, 'square', 0.08, i * 0.06);
   }
 
@@ -88,7 +107,7 @@ class AudioManager {
   }
 
   victory() {
-    [523, 659, 784, 1047].forEach((f, i) => this._tone(f, 0.3, 'sine', 0.2, i * 0.18));
+    [523, 659, 784, 1047].forEach(function(f, i) { this._tone(f, 0.3, 'sine', 0.2, i * 0.18); }.bind(this));
   }
 
   turnStart() { this._tone(660, 0.12, 'sine', 0.1); }
